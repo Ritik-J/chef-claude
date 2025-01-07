@@ -1,18 +1,23 @@
 import { useState } from "react";
 import Recipe from "./Recipe";
+import { getRecipeFromMistral } from "../../ai";
 
 const Ingredients = () => {
   const [ingredients, setIngredients] = useState([]);
+  const [recipe, setRecipe] = useState("");
 
   const handleSubmit = (formData) => {
     const data = formData.get("text");
     setIngredients((prev) => [...prev, data]);
   };
 
-  const getRecipe = () => {
+  const getRecipe = async () => {
     if (ingredients.length <= 3) {
       alert(`you need to add more than 3 items to get a recipe`);
     }
+    const genratedRecipe = await getRecipeFromMistral(ingredients);
+    setRecipe(genratedRecipe);
+    console.log(genratedRecipe);
   };
 
   return (
@@ -23,6 +28,7 @@ const Ingredients = () => {
           className="mt-12 h-9 flex flex-col sm:flex-row justify-center items-center gap-3"
         >
           <input
+            required
             type="text"
             name="text"
             placeholder="eg: strawberry"
@@ -67,7 +73,7 @@ const Ingredients = () => {
           </div>
         </section>
       )}
-      <Recipe />
+      {recipe && <Recipe recipe={recipe} />}
     </div>
   );
 };
