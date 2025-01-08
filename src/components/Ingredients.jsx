@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Recipe from "./Recipe";
 import { getRecipeFromMistral } from "../../ai";
+import { toast, ToastContainer } from "react-toastify";
 
 const Ingredients = () => {
   const [ingredients, setIngredients] = useState([]);
@@ -13,11 +14,18 @@ const Ingredients = () => {
 
   const getRecipe = async () => {
     if (ingredients.length <= 3) {
-      alert(`you need to add more than 3 items to get a recipe`);
+      toast.info("you need to add more than 3 items to get a recipe");
+    } else {
+      const genratedRecipe = await toast.promise(
+        getRecipeFromMistral(ingredients),
+        {
+          pending: "Genrating response",
+          success: "Response generated",
+          error: "couldn't generate response",
+        }
+      );
+      setRecipe(genratedRecipe);
     }
-    const genratedRecipe = await getRecipeFromMistral(ingredients);
-    setRecipe(genratedRecipe);
-    console.log(genratedRecipe);
   };
 
   return (
@@ -70,6 +78,7 @@ const Ingredients = () => {
             >
               Get a recipe
             </button>
+            <ToastContainer />
           </div>
         </section>
       )}
